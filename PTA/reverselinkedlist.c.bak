@@ -1,0 +1,321 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/*
+1. read data and make linked list
+2. scan every K node in linked list
+   to decide whether reversing
+3. reversing linked list
+*/
+
+/*
+00100 6 4
+00000 4 99999
+00100 1 12309
+68237 6 -1
+33218 3 00000
+99999 5 68237
+12309 2 33218
+*/
+
+typedef struct _node{
+    int preadd;
+    int data;
+    int nextadd;
+    struct _node *link;
+} linkedlist;
+
+//
+// ==============================================
+typedef struct _stack{
+    linkedlist *pointer;
+    struct _stack *link;
+} Stack;
+
+//
+// ==============================================
+linkedlist* ReadData();
+Stack* MakeStack();
+void Push(Stack* *pStack, linkedlist *item);
+linkedlist* Pop(Stack* *pStack);
+int CountStack(Stack* *pStack);
+int IsEmpty(Stack* *pStack);
+void Attach(linkedlist* *pHead, linkedlist* *item);
+void Insert(linkedlist* *pHead, linkedlist* *item);
+void reverse(linkedlist* *pHead, int Knum);
+
+
+//
+// ==============================================
+int main(int argc, char const *argv[]){
+    int Knum;
+    linkedlist *Head;
+    Head = ReadData(&Knum);
+    reverse(&Head, Knum);
+    return 0;
+}
+
+//
+// ==============================================
+linkedlist* ReadData(int *Knum){
+
+    int init, num, k, loop;
+    linkedlist *tmp, *rear;
+    tmp = (linkedlist*)malloc(sizeof(linkedlist));
+    tmp->link = NULL;
+    rear = tmp;
+
+    scanf("%d %d %d",&init,&num,&k);
+    *Knum = k;
+    loop = num;
+    while(num--){
+        int pre, d, next;
+        linkedlist *p;
+        scanf("%d %d %d",&pre,&d,&next);
+        p = (linkedlist*)malloc(sizeof(linkedlist));
+        p->preadd = pre;
+        p->data = d;
+        p->nextadd = next;
+        p->link = NULL;
+        rear->link = p;
+        rear = p;
+    }
+
+    /* right ordered linked list */
+    linkedlist *head;
+    linkedlist *rear_head;
+    linkedlist *t;
+    //rear = tmp;
+    head = (linkedlist*)malloc(sizeof(linkedlist));
+    head->link = NULL;
+    rear_head = head;
+
+    while(loop--){
+        rear = tmp;
+        while(rear->link && rear->link->preadd != init){
+            rear = rear->link;
+        }
+        t = rear->link;
+        rear->link = t->link;
+        rear_head->link = t;
+        t->link = NULL;
+        rear_head = t;
+
+        init = rear_head->nextadd;
+    }
+    t = head;
+    head = head->link;
+    free(t);
+
+    // linkedlist *i;
+    // for (i = head; i; i = i->link){
+    //     printf("preadd:%d\n", i->preadd);
+    //     printf("data:%d\n", i->data);
+    //     printf("nextadd:%d\n", i->nextadd);
+    // }
+    
+    // debug
+    // ======================
+    // Stack *mystack;
+    // mystack = MakeStack();
+    // linkedlist *i;
+    // for (i = head; i; i = i->link){
+    //     Push(&mystack,i);
+    // }
+
+    // // int c;
+    // // c = CountStack(&mystack);
+    // // printf("%d\n", c);
+    // // Stack *s, *temp;
+    // // temp = mystack;
+    // // mystack = mystack->link;
+    // // free(temp);
+    // // linkedlist *rear;
+    // rear = head;
+    // while(rear->link){
+    //     rear = rear->link;
+    // }
+    // printf("rear_preadd:%d\n", rear->preadd);
+    // printf("rear_data:%d\n", rear->data);
+    // printf("rear_nextadd:%d\n", rear->nextadd);
+    // rear = head;
+    // while(IsEmpty(&mystack)==0){
+    //     linkedlist *item;
+    //     linkedlist * p;
+    //     item = Pop(&mystack);
+
+        // p = (linkedlist*)malloc(sizeof(linkedlist));
+        // p->data = item->data;
+        // p->preadd = item->preadd;
+        // p->nextadd = item->nextadd;
+        // p->link = NULL;
+        // rear->link = p;
+        // // item->link = NULL;
+        // rear = p;
+
+        // Attach(&head,&item);
+    //     printf("item_preadd:%d\n", item->preadd);
+    //     printf("item_data:%d\n", item->data);
+    //     printf("item_nextadd:%d\n", item->nextadd);
+    // }
+
+    // for (i = head; i; i = i->link){
+    //     printf("preadd:%d\n", i->preadd);
+    //     printf("data:%d\n", i->data);
+    //     printf("nextadd:%d\n", i->nextadd);
+    // }
+
+    // for (s = mystack; s; s = s->link){
+    //     // printf("pointer:%p\n", s->pointer);
+    //     printf("preadd:%d\n", (s->pointer)->preadd);
+    //     printf("data:%d\n", (s->pointer)->data);
+    //     printf("nextadd:%d\n", (s->pointer)->nextadd);
+    // }
+    // ======================
+    return head;
+}
+
+//
+// ==============================================
+Stack* MakeStack(){
+    Stack *p;
+    p = (Stack*)malloc(sizeof(Stack));
+    p->link = NULL;
+
+    return p;
+}
+
+//
+// ==============================================
+void Push(Stack* *pStack, linkedlist *item){
+    Stack *p, *tmp;
+    p = (Stack*)malloc(sizeof(Stack));
+    p->pointer = item;
+    
+    tmp = (*pStack)->link;
+    (*pStack)->link = p;
+    p->link = tmp;
+}
+
+//
+// ==============================================
+linkedlist* Pop(Stack* *pStack){
+    linkedlist* item;
+    Stack *p;
+    p = (*pStack)->link;
+    (*pStack)->link = p->link;
+    item = p->pointer;
+    return item;
+}
+
+//
+// ==============================================
+int CountStack(Stack* *pStack){
+    Stack *i;
+    int count = 0;
+    for (i = (*pStack); i; i = i->link){
+        if (i->pointer != NULL){
+            count ++;
+        }
+    }
+    return count;
+}
+
+//
+// ==============================================
+int IsEmpty(Stack* *pStack){
+    int flag;
+    if((*pStack)->link==NULL){
+        flag = 1;
+    }else{
+        flag = 0;
+    }
+
+    return flag;
+}
+
+//
+// ==============================================
+void Attach(linkedlist* *pHead, linkedlist* *item){
+    linkedlist *rear;
+    linkedlist *p;
+    rear = *pHead;
+    while(rear->link){
+        rear = rear->link;
+    }
+    p = (linkedlist*)malloc(sizeof(linkedlist));
+    p->data = (*item)->data;
+    p->preadd = (*item)->preadd;
+    p->nextadd = (*item)->nextadd;
+    p->link = NULL;
+    rear->link = p;
+
+    // if attach a node to Rear, must malloc a new
+    // space, otherwise will be wrong; can't do like
+    // code below;
+
+    // rear->link = (*item);
+    // (*item)->link = NULL;
+}
+
+//
+// ==============================================
+void Insert(linkedlist* *pHead, linkedlist* *item){
+    linkedlist *rear, *t;
+    linkedlist *p;
+    rear = *pHead;
+
+    while((rear->link)->link){
+        rear = rear->link;
+    }
+
+    p = (linkedlist*)malloc(sizeof(linkedlist));
+    p->data = (*item)->data;
+    p->preadd = (*item)->preadd;
+    p->nextadd = (*item)->nextadd;
+    p->link = NULL;
+
+    rear->link = t;
+    rear->link = *item;
+    (*item)->link = t;
+}
+
+
+//
+// ==============================================
+void reverse(linkedlist* *pHead, int Knum){
+    linkedlist *i;
+    Stack *mystack, *mystack2;
+    linkedlist *item;
+    int count;
+
+    mystack = MakeStack();
+    mystack2 = MakeStack();
+    for (i = (*pHead); i; i = i->link){
+        count = CountStack(&mystack);
+        if (count == Knum){
+            while(IsEmpty(&mystack)==0){
+                item = Pop(&mystack);
+                printf("%d %d %d\n",item->preadd,item->data,item->nextadd);
+            }
+        }
+        Push(&mystack, i);
+    }
+
+    if (CountStack(&mystack)==Knum){
+        while(IsEmpty(&mystack)==0){
+            item = Pop(&mystack);
+            printf("%d %d %d\n",item->preadd,item->data,item->nextadd);
+        }
+    }else{
+        while(IsEmpty(&mystack)==0){
+            item = Pop(&mystack);
+            Push(&mystack2, item);
+        }
+
+        while(IsEmpty(&mystack2)==0){
+            item = Pop(&mystack2);
+            printf("%d %d %d\n",item->preadd,item->data,item->nextadd);
+        }
+    }
+}

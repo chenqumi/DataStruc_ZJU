@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _poly{
+    int coef;
+    int expon;
+    struct _poly* next; 
+} polynomial;
+
+//prototype
+polynomial* savedata(polynomial* head, int* num);
+//void attach(int co, int ex, polynomial* *pRear);
+void calc(polynomial* poly1, int* num1, polynomial* poly2, int* num2);
+
+int main(int argc, char const *argv[]){
+    
+    int* num1;
+    int* num2;
+    int init1 = -1;
+    int init2 = -1;
+    num1 = &init1;
+    num2 = &init2;
+    polynomial* poly1;
+    polynomial* poly2;
+    polynomial* i;
+    poly1 = NULL;
+    poly2 = NULL;
+
+    poly1 = savedata(poly1,num1);
+    poly2 = savedata(poly2,num2);
+
+    // printf("number: %d\n", *num1);
+    // printf("number: %d\n", *num2);
+
+    // for(i=poly1; i; i=i->next){
+    //     //printf("1\n");
+    //     printf("coef:%d expon:%d\n", i->coef,i->expon);
+    // }
+
+    calc(poly1,num1,poly2,num2);
+     return 0;
+}
+
+polynomial* savedata(polynomial* head, int* num){
+
+    int n;
+    scanf("%d",&n);
+    //printf("%d\n", n);
+    //num = &n;
+    *num = n;
+    // printf("address:%p\n", num);
+    // printf("%d\n", *num);
+    // //polynomial* head = NULL;
+    //head = NULL;
+    polynomial* last = head;
+    polynomial* i;
+    
+    while(n--){
+        int co,ex;
+    //    polynomial* p;
+        scanf("%d %d",&co,&ex);
+        p = (polynomial*)malloc(sizeof(polynomial));
+        p->coef = co;
+        p->expon = ex;
+        p->next = NULL;
+
+        if(last){
+            while(last->next){
+                last = last->next;
+            }
+            last->next = p;
+        }else{
+            head = p;
+        }
+        
+        last = head;
+    }
+
+    return head;
+    // for(i=head; i; i=i->next){
+    //     //printf("1\n");
+    //     printf("coef:%d expon:%d\n", i->coef,i->expon);
+    // }
+}
+
+// void attach(int co, int ex, polynomial* *pRear){
+//     polynomial* p;
+//     p = (polynomial*)malloc(sizeof(polynomial));
+//     p->coef = co;
+//     p->expon = ex;
+//     p->next = NULL;
+
+//     (*pRear)-> next = p;
+//     *pRear = p;
+// }
+
+
+
+void calc(polynomial* poly1, int* num1, polynomial* poly2, int* num2){
+    polynomial* i;
+    polynomial* j;
+    int co[(*num1)*(*num2)];
+    int ex[(*num1)*(*num2)];
+    int co_tmp;
+    int ex_tmp;
+    int index = 0;
+
+    for(i = poly1; i; i = i->next){
+        for(j = poly2; j; j = j->next){
+            co_tmp = (i->coef) * (j->coef);
+            ex_tmp = (i->expon) + (j->expon);
+
+            co[index] = co_tmp;
+            ex[index] = ex_tmp;
+            index ++;
+        }
+    }
+
+    // for (index = 0; index < (*num1)*(*num2); index++){
+    //     printf("coef: %d\n", co[index]);
+    //     printf("expon: %d\n", ex[index]);
+    // }
+}
